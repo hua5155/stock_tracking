@@ -10,16 +10,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model manufactures {
-  id          String    @id @unique @default(uuid())
-  manufacture String    @unique
-  products    product[] // Many product one Manufacture.
+model brands {
+  id        String    @id @unique @default(uuid())
+  brandName String    @unique
+  products  product[] // Many product one Manufacture.
 }
 
 model product {
-  id            String       @id @unique @default(uuid())
-  productName   String       @unique
-  stock         Int
-  manufacture   manufactures @relation(fields: [manufactureId], references: [id])
-  manufactureId String
+  id          String @id @unique @default(uuid())
+  productName String @unique
+  stock       Int
+
+  brand     brands      @relation(fields: [brandId], references: [id])
+  brandId   String
+  innerTube innerTubes?
+  tire      tires?
+}
+
+model innerTubes {
+  id       String @id @unique @default(uuid())
+  diameter Int
+  width    Int
+
+  product   product @relation(fields: [productId], references: [id])
+  productId String  @unique
+}
+
+model tires {
+  id       String @id @unique @default(uuid())
+  diameter Int
+  width    Int
+
+  product   product @relation(fields: [productId], references: [id])
+  productId String  @unique
 }
