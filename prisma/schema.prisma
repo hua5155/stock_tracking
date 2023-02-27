@@ -10,37 +10,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model brands {
+model Brand {
   id        String    @id @unique @default(uuid())
   brandName String    @unique
-  products  product[] // Many product one Manufacture.
+  products  Product[] // Many product one Manufacture.
 }
 
-model product {
+model Product {
   id          String @id @unique @default(uuid())
   productName String @unique
+  price       Int
   stock       Int
 
-  brand     brands      @relation(fields: [brandId], references: [id])
+  brand     Brand      @relation(fields: [brandId], references: [id])
   brandId   String
-  innerTube innerTubes?
-  tire      tires?
+  innerTube InnerTube?
+  tire      Tire?
 }
 
-model innerTubes {
+model InnerTube {
   id       String @id @unique @default(uuid())
   diameter Int
   width    Int
 
-  product   product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
   productId String  @unique
 }
 
-model tires {
+model Tire {
   id       String @id @unique @default(uuid())
   diameter Int
   width    Int
 
-  product   product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
   productId String  @unique
+}
+
+model Order {
+  id    String   @id @unique @default(uuid())
+  date  DateTime
+  items Json // {{"itemName": "itemName", "itemPrice": itemPrice}, ...}
+  total Int
 }
