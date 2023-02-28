@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.sqlite"
+  // url      = env("DATABASE_URL")  // MySQL local dev DB
 }
 
 model Brand {
@@ -46,9 +47,16 @@ model Tire {
   productId String  @unique
 }
 
+// model Order {
+//   id    String   @id @unique @default(uuid())
+//   date  DateTime
+//   items Json // {{"itemName": "itemName", "itemPrice": itemPrice}, ...}
+//   total Int
+// }
+
 model Order {
   id    String   @id @unique @default(uuid())
   date  DateTime
-  items Json // {{"itemName": "itemName", "itemPrice": itemPrice}, ...}
+  items String // sqlite don't support json.
   total Int
 }
