@@ -14,7 +14,7 @@
 	</label>
 	<input
 		class="h-10 rounded-xl border-2 px-3 pb-1 text-xl placeholder:text-pink-600 focus:outline-none
-      {fieldError ?? true
+			{fieldError ?? true
 			? 'border-pink-300 text-pink-600 focus:border-pink-500'
 			: 'border-sky-300 focus:border-sky-500'}"
 		type="text"

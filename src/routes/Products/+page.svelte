@@ -4,8 +4,9 @@
 
 	import type { PageData, ActionData } from './$types';
 
-	// export let pageData: PageData;
+	export let data: PageData;
 	// export let form: ActionData;
+	$: console.log('pageData :\n', data);
 
 	// let brandArray = data.query.map(ele => ele.brandName);  // map is slower than for loop, custom function??
 	// // console.log(brandArray);
@@ -22,7 +23,7 @@
 <main class="flex justify-center bg-gray-800">
 	<div class="flex h-fit w-fit flex-col">
 		<AddProduct />
-		<DeleteProduct />
+		<!-- <DeleteProduct /> -->
 
 		<!-- <div>{pageData}</div> -->
 	</div>

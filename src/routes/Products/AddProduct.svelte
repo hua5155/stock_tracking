@@ -1,7 +1,9 @@
 <script context="module" lang="ts">
 	const formSchema = z.object({
-		brandName: z.string().min(1, { message: 'Brand name is empty' }).trim(),
+		productBrand: z.string().min(1, { message: 'Brand name is empty' }).trim(),
 		productName: z.string().min(1, { message: 'Product name is empty' }).trim(),
+		productCategory: z.string().min(1, { message: 'Category is empty' }).trim(),
+		variant: z.string().min(1, { message: 'Variant is empty' }).trim(),
 		price: z.string(),
 		stock: z.string()
 	});
@@ -14,7 +16,6 @@
 			.gte(0, { message: "Stock can't be negative" })
 	});
 	export type formType = z.infer<typeof formSchema>;
-	// const formField = formSchema.keyof().options;
 	const fieldName = Object.fromEntries(
 		formSchema.keyof().options.map((key) => [key, key])
 	) as formType;
@@ -28,23 +29,23 @@
 	import { z } from 'zod';
 	import { writable } from 'svelte/store';
 
-	let updateFlag = false;
-
 	const formFields = writable<formType>({
-		brandName: '',
+		productBrand: '',
 		productName: '',
+		productCategory: '',
+		variant: '',
 		price: '0',
 		stock: '0'
 	});
 
 	const formErrors = writable<formType>({
-		brandName: '',
+		productBrand: '',
 		productName: '',
+		productCategory: '',
+		variant: '',
 		price: '',
 		stock: ''
 	});
-	// const formErrors = writable(Object.fromEntries(productKey.map((key) => [key, ''])));
-	// const formErrors = writable(productKey.map((key) => [key, '']));
 
 	const submitCreate: SubmitFunction = ({ form, data, action, cancel }) => {
 		// console.log('form : ', form);
@@ -56,16 +57,14 @@
 		if (zResult.success === false) {
 			const { fieldErrors: zErrors } = zResult.error.flatten();
 			console.log('client-side validation error :\n', zErrors); // debug
-			formFields.set({
-				brandName: formData.brandName,
-				productName: formData.productName,
-				price: zErrors.price !== undefined ? '' : formData.price,
-				stock: zErrors.stock !== undefined ? '' : formData.stock
-			});
+			$formFields.price = zErrors.price !== undefined ? '' : formData.price;
+			$formFields.stock = zErrors.stock !== undefined ? '' : formData.stock;
 			console.log('formFields :\n', $formFields); // debug
 			formErrors.set({
-				brandName: zErrors.brandName?.at(0) ?? '',
+				productBrand: zErrors.productBrand?.at(0) ?? '',
 				productName: zErrors.productName?.at(0) ?? '',
+				productCategory: zErrors.productCategory?.at(0) ?? '',
+				variant: zErrors.variant?.at(0) ?? '',
 				price: zErrors.price?.at(0) ?? '',
 				stock: zErrors.stock?.at(0) ?? ''
 			});
@@ -80,15 +79,19 @@
 
 			if (result.type === 'success') {
 				formFields.set({
-					brandName: '',
+					productBrand: '',
 					productName: '',
+					productCategory: '',
+					variant: '',
 					price: '0',
 					stock: '0'
 				});
 				console.log('formFields :\n', $formFields); // debug
 				formErrors.set({
-					brandName: '',
+					productBrand: '',
 					productName: '',
+					productCategory: '',
+					variant: '',
 					price: '',
 					stock: ''
 				});
@@ -99,56 +102,89 @@
 	};
 </script>
 
-<div class="rounded-2xl bg-gray-300 p-7 text-black">
-	<form action="?/createProduct" method="post" use:enhance={submitCreate}>
-		<h3 class="mb-4 text-3xl font-semibold">New product</h3>
+<div class="rounded-2xl bg-gray-300 p-9 text-black">
+	<form action="?/newProduct" method="post" use:enhance={submitCreate}>
+		<h3 class="mb-4 text-center text-3xl font-semibold">New product</h3>
 
-		<!-- brand name field -->
-		<FormInput
-			fieldName={fieldName.brandName}
-			labelName="Brand"
-			bind:fieldValue={$formFields.brandName}
-			fieldError={$formErrors.brandName}
-		/>
+		<div class="flex flex-row space-x-5">
+			<!-- brand name field -->
+			<div class="w-40">
+				<FormInput
+					fieldName={fieldName.productBrand}
+					labelName="Brand"
+					bind:fieldValue={$formFields.productBrand}
+					fieldError={$formErrors.productBrand}
+				/>
+			</div>
 
-		<!-- product name field -->
-		<FormInput
-			fieldName={fieldName.productName}
-			labelName="Product"
-			bind:fieldValue={$formFields.productName}
-			fieldError={$formErrors.productName}
-		/>
+			<!-- product name field -->
+			<div class="w-52">
+				<FormInput
+					fieldName={fieldName.productName}
+					labelName="Product"
+					bind:fieldValue={$formFields.productName}
+					fieldError={$formErrors.productName}
+				/>
+			</div>
 
-		<!-- price field -->
-		<FormInput
-			fieldName={fieldName.price}
-			labelName="Price"
-			bind:fieldValue={$formFields.price}
-			fieldError={$formErrors.price}
-		/>
+			<!-- variant name field -->
+			<div class="w-52">
+				<FormInput
+					fieldName={fieldName.variant}
+					labelName="Variant"
+					bind:fieldValue={$formFields.variant}
+					fieldError={$formErrors.variant}
+				/>
+			</div>
+		</div>
 
-		<!-- stock field -->
-		<FormInput
-			fieldName={fieldName.stock}
-			labelName="Stock"
-			bind:fieldValue={$formFields.stock}
-			fieldError={$formErrors.stock}
-		/>
+		<div class="flex flex-row space-x-5">
+			<!-- price name field -->
+			<div class="w-32">
+				<FormInput
+					fieldName={fieldName.price}
+					labelName="Price"
+					bind:fieldValue={$formFields.price}
+					fieldError={$formErrors.price}
+				/>
+			</div>
+
+			<!-- stock name field -->
+			<div class="w-32">
+				<FormInput
+					fieldName={fieldName.stock}
+					labelName="Stock"
+					bind:fieldValue={$formFields.stock}
+					fieldError={$formErrors.stock}
+				/>
+			</div>
+		</div>
+
+		<!-- category field -->
+		<div class="w-48">
+			<FormInput
+				fieldName={fieldName.productCategory}
+				labelName="Category"
+				bind:fieldValue={$formFields.productCategory}
+				fieldError={$formErrors.productCategory}
+			/>
+		</div>
+
 		<button
 			class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
 			type="submit"
 		>
-			Add brand
+			Add product
 		</button>
 	</form>
 </div>
-<div>
+<!-- <div>
 	brand name errors : {$formErrors.brandName} <br />
 	product name errors : {$formErrors.productName} <br />
 	price errors : {$formErrors.price} <br />
 	stock errors : {$formErrors.stock}
-</div>
-<button
+</div> -->
+<!-- <button
 	on:click={() => {
 		formFields.set({
 			brandName: 'BRAND',
@@ -157,9 +193,28 @@
 			stock: 'STOCK'
 		});
 	}}>TEST</button
->
+> -->
 <button
+	class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
 	on:click={() => {
 		console.log($formFields);
 	}}>console log</button
 >
+<form action="?/dummyData" method="post" use:enhance>
+	<button
+		class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+		type="submit">dummyData</button
+	>
+</form>
+<form action="?/writeTest" method="post" use:enhance>
+	<button
+		class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+		type="submit">writeTest</button
+	>
+</form>
+<form action="?/deleteTest" method="post" use:enhance>
+	<button
+		class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+		type="submit">deleteTest</button
+	>
+</form>
