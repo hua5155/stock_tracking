@@ -2,14 +2,15 @@ import type { Actions, PageServerLoad } from "./$types";
 import { fail } from "@sveltejs/kit";
 import { prisma } from "$lib/server/prisma";
 import { Prisma } from '@prisma/client'
-import { z } from "zod"
+import type { z } from "zod"
 
 import { formValidator as createValidator } from "./AddProduct.svelte"
+type createSchema = z.infer<typeof createValidator>
 import type { formType as createForm } from "./AddProduct.svelte"
 
 import { dummyData } from "./TestData.svelte"
 
-const createProduct = async (data: createForm) => {
+const createProduct = async (data: createSchema) => {
   await prisma.product.create({
     data: {
       brand: {
@@ -25,16 +26,28 @@ const createProduct = async (data: createForm) => {
           create: { categoryName: data.productCategory }
         }
       },
-      productVariant: data.variant,
-      price: Number(data.price),
-      stock: Number(data.stock)
+      productVariant: data.productVariant,
+      price: data.price,
+      stock: data.stock
+    }
+  })
+}
+const deleteProduct = async (productId: string) => {
+  await prisma.product.delete({
+    where: {
+      id: productId
     }
   })
 }
 
 export const load: PageServerLoad = (async ({ params }) => {
-  const query = await prisma.product.findMany({
+  const products = prisma.product.findMany({
+    orderBy: [
+      { productBrand: 'asc' },
+      { productName: 'asc' }
+    ],
     select: {
+      id: true,
       productBrand: true,
       productName: true,
       productCategory: true,
@@ -43,10 +56,42 @@ export const load: PageServerLoad = (async ({ params }) => {
       stock: true
     }
   });
+  const brands = prisma.brand.findMany({
+    orderBy: { brandName: 'asc' },
+    select: { brandName: true }
+  });
+  const categories = prisma.category.findMany({
+    orderBy: { categoryName: 'asc' },
+    select: { categoryName: true }
+  });
+
+  try {
+    await prisma.$transaction(
+      [
+        products,
+        brands,
+        categories
+      ],
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      }
+    )
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.log('Error code : ' + error.code);
+    }
+    if (error instanceof Prisma.PrismaClientUnknownRequestError) {
+      console.log(error.message);
+    }
+  }
 
   // console.log('server-side pageData :\n', returnData);  // debug
 
-  return { products: query };
+  return {
+    products: products,
+    brands: brands,
+    categories: categories
+  };
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
@@ -70,74 +115,24 @@ export const actions: Actions = {
     }
 
     try {
-      createProduct(formData);
+      createProduct(zResult.data);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         console.log('Error code : ' + error.code);  // debug
       }
+      if (error instanceof Prisma.PrismaClientUnknownRequestError) {
+        console.log(error.message);
+      }
       return fail(500, { message: "Something went wrong, Couldn't create the product." });
     }
   },
-  deleteProduct: async ({ request }) => {
-    // const deleteData = Object.fromEntries(await request.formData()) as { brandName: string };
+  deleteProduct: async ({ url }) => {
+    const productId = url.searchParams.get('productId')
 
-    // try {
-    //   await prisma.brand.update({
-    //     where: { ...deleteData },
-    //     data: {
-    //       products: {
-    //         deleteMany: {},
-    //       },
-    //     }
-    //   });
-    //   await prisma.brand.delete({
-    //     where: { ...deleteData },
-    //   });
-    // } catch (error) {
-    //   console.log(error);
-    //   return fail(500, { message: "Something went wrong, Couldn't delete the brand." });
-    // }
-    // return { status: 200 };
-  },
-  dummyData: async ({ request }) => {
-    for (const product of dummyData) {
-      for (const variant of product.variants) {
-        try {
-          console.log(
-            "creating : " +
-            product.productBrand + " " +
-            product.productName + " " +
-            variant.variant
-          ); // debug
-          createProduct({
-            productBrand: product.productBrand,
-            productName: product.productName,
-            productCategory: product.productCategory,
-            variant: variant.variant,
-            price: variant.price.toString(),
-            stock: variant.stock.toString()
-          } as createForm);
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            console.log('Error code : ' + error.code);
-          }
-        }
-      }
-    }
-  },
-  writeTest: async ({ request }) => {
-    console.log('writeTest hit');
-    const testData: createForm = {
-      productBrand: 'Pirelli',
-      productName: 'Rosso Scooter',
-      productCategory: 'Motorcycle tire',
-      variant: '110/70R12 F',
-      price: '0',
-      stock: '0'
-    }
+    if (productId === null) return fail(500, { message: "Parameter : productId missing." });
 
     try {
-      createProduct(testData)
+      deleteProduct(productId);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         console.log('Error code : ' + error.code);
@@ -145,35 +140,68 @@ export const actions: Actions = {
       if (error instanceof Prisma.PrismaClientUnknownRequestError) {
         console.log(error.message);
       }
+      return fail(500, { message: "Something went wrong, Couldn't delete the brand." });
     }
   },
-  deleteTest: async ({ request }) => {
-    console.log('deleteTest hit');
-    const testValidator = z.object({
-      productBrand: z.string(),
-      productName: z.string(),
-      productVariant: z.string()
-    });
-    type testType = z.infer<typeof testValidator>
-    const testData: testType = {
-      productBrand: 'Pirelli',
-      productName: 'Rosso Scooter',
-      productVariant: '110/70R12 F'
-    };
+  dummyData: async ({ request }) => {
+    let promiseArray = []
+
+    for (const product of dummyData) {
+      for (const variant of product.variants) {
+        // console.log(
+        //   "creating : " +
+        //   product.productBrand + " " +
+        //   product.productName + " " +
+        //   variant.variant
+        // ); // debug
+
+        // createProduct({
+        //   productBrand: product.productBrand,
+        //   productName: product.productName,
+        //   productCategory: product.productCategory,
+        //   productVariant: variant.variant,
+        //   price: variant.price.toString(),
+        //   stock: variant.stock.toString()
+        // } as createForm)
+
+        promiseArray.push(
+          prisma.product.create({
+            data: {
+              brand: {
+                connectOrCreate: {
+                  where: { brandName: product.productBrand },
+                  create: { brandName: product.productBrand }
+                }
+              },
+              productName: product.productName,
+              productVariant: variant.variant,
+              price: variant.price,
+              stock: variant.stock,
+              category: {
+                connectOrCreate: {
+                  where: { categoryName: product.productCategory },
+                  create: { categoryName: product.productCategory }
+                }
+              }
+            }
+          })
+        )
+      }
+    }
 
     try {
-      await prisma.product.delete({
-        where: {
-          productBrand_productName_productVariant: {
-            productBrand: testData.productBrand,
-            productName: testData.productName,
-            productVariant: testData.productVariant
-          }
+      await prisma.$transaction(
+        promiseArray,
+        {
+          isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
         }
-      })
+      )
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         console.log('Error code : ' + error.code);
+      }
+      if (error instanceof Prisma.PrismaClientUnknownRequestError) {
+        console.log(error.message);
       }
     }
   }

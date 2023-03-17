@@ -15,7 +15,10 @@ build with SvelteKit, TailwindCSS, Prisma, SQLite, zod
 - [ ] Figure how applyAction works.
 - [ ] Write server.ts code for those pages
 - [x] Write function & dummy data to put into DB after a `prisma db push`.
-  - [ ] weird connection timeout issue. GitHub issue? ([link](https://github.com/prisma/prisma/issues/10306))
+  - weird connection timeout issue. GitHub issue? ([link](https://github.com/prisma/prisma/issues/10306))
+  - Solved it by putting all the promise in a array and resolve it sequantially.
+- [ ] Queue all the primsa query into a batch?
+  - Prisma - Transactions and batch queries ([link](https://www.prisma.io/docs/concepts/components/prisma-client/transactions#sequential-prisma-client-operations))
 
 ## available DB actions
 **Product**
@@ -25,7 +28,3 @@ build with SvelteKit, TailwindCSS, Prisma, SQLite, zod
 **Brand**
 - Create brand
 - Remove brand & remove all the products it has(Double check required).
-
-## Notes
-- [ ] Remember to `npx prisma db push` for new schema
-  - still testing

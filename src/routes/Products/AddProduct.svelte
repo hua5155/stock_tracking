@@ -3,7 +3,7 @@
 		productBrand: z.string().min(1, { message: 'Brand name is empty' }).trim(),
 		productName: z.string().min(1, { message: 'Product name is empty' }).trim(),
 		productCategory: z.string().min(1, { message: 'Category is empty' }).trim(),
-		variant: z.string().min(1, { message: 'Variant is empty' }).trim(),
+		productVariant: z.string().min(1, { message: 'Variant is empty' }).trim(),
 		price: z.string(),
 		stock: z.string()
 	});
@@ -26,14 +26,54 @@
 	import FormInput from '$lib/conponents/FormInput.svelte';
 
 	import { applyAction, enhance, type SubmitFunction } from '$app/forms';
-	import { z } from 'zod';
+	import type { PageData } from './$types';
 	import { writable } from 'svelte/store';
+	import { z } from 'zod';
+	import { invalidateAll } from '$app/navigation';
+
+	export let data: PageData;
+	$: brands = data.brands.map((item) => item.brandName);
+	$: categories = data.categories.map((item) => item.categoryName);
+	$: products = productFiltering($formFields.productBrand);
+	$: variants = variantFiltering($formFields.productName);
+
+	const productFiltering = (filter: string) => {
+		let brandFilter = data.products
+			.filter((ele) => {
+				return ele.productBrand.toLowerCase().includes(filter.toLowerCase());
+			})
+			.map((ele) => ele.productName);
+
+		let deDuplicate = brandFilter.filter((ele, index) => {
+			return brandFilter.indexOf(ele) === index;
+		});
+
+		return deDuplicate;
+	};
+
+	const variantFiltering = (filter: string) => {
+		let productFilter = data.products
+			.filter((ele) => {
+				return ele.productName.toLowerCase() === filter.toLowerCase();
+			})
+			.map((ele) => ele.productVariant);
+
+		return productFilter;
+	};
+
+	const autofillBrand = () => {
+		for (const ele of data.products) {
+			if ($formFields.productName === ele.productName) {
+				$formFields.productBrand = ele.productBrand;
+			}
+		}
+	};
 
 	const formFields = writable<formType>({
 		productBrand: '',
 		productName: '',
 		productCategory: '',
-		variant: '',
+		productVariant: '',
 		price: '0',
 		stock: '0'
 	});
@@ -42,7 +82,7 @@
 		productBrand: '',
 		productName: '',
 		productCategory: '',
-		variant: '',
+		productVariant: '',
 		price: '',
 		stock: ''
 	});
@@ -64,7 +104,7 @@
 				productBrand: zErrors.productBrand?.at(0) ?? '',
 				productName: zErrors.productName?.at(0) ?? '',
 				productCategory: zErrors.productCategory?.at(0) ?? '',
-				variant: zErrors.variant?.at(0) ?? '',
+				productVariant: zErrors.productVariant?.at(0) ?? '',
 				price: zErrors.price?.at(0) ?? '',
 				stock: zErrors.stock?.at(0) ?? ''
 			});
@@ -82,7 +122,7 @@
 					productBrand: '',
 					productName: '',
 					productCategory: '',
-					variant: '',
+					productVariant: '',
 					price: '0',
 					stock: '0'
 				});
@@ -91,17 +131,19 @@
 					productBrand: '',
 					productName: '',
 					productCategory: '',
-					variant: '',
+					productVariant: '',
 					price: '',
 					stock: ''
 				});
 				// await update();
 				// await applyAction(result);
+				invalidateAll();
 			}
 		};
 	};
 </script>
 
+<!-- AddProduct -->
 <div class="rounded-2xl bg-gray-300 p-9 text-black">
 	<form action="?/newProduct" method="post" use:enhance={submitCreate}>
 		<h3 class="mb-4 text-center text-3xl font-semibold">New product</h3>
@@ -114,8 +156,15 @@
 					labelName="Brand"
 					bind:fieldValue={$formFields.productBrand}
 					fieldError={$formErrors.productBrand}
+					list={brands}
 				/>
 			</div>
+
+			<!-- <datalist id="brand-field">
+				{#each brandList as item}
+					<option value={item} />
+				{/each}
+			</datalist> -->
 
 			<!-- product name field -->
 			<div class="w-52">
@@ -124,16 +173,32 @@
 					labelName="Product"
 					bind:fieldValue={$formFields.productName}
 					fieldError={$formErrors.productName}
+					list={products}
+					onclickFunc={autofillBrand}
+				/>
+			</div>
+		</div>
+
+		<div class="flex flex-row space-x-5">
+			<!-- variant name field -->
+			<div class="w-80">
+				<FormInput
+					fieldName={fieldName.productVariant}
+					labelName="Variant"
+					bind:fieldValue={$formFields.productVariant}
+					fieldError={$formErrors.productVariant}
+					list={variants}
 				/>
 			</div>
 
-			<!-- variant name field -->
-			<div class="w-52">
+			<!-- category field -->
+			<div class="w-48">
 				<FormInput
-					fieldName={fieldName.variant}
-					labelName="Variant"
-					bind:fieldValue={$formFields.variant}
-					fieldError={$formErrors.variant}
+					fieldName={fieldName.productCategory}
+					labelName="Category"
+					bind:fieldValue={$formFields.productCategory}
+					fieldError={$formErrors.productCategory}
+					list={categories}
 				/>
 			</div>
 		</div>
@@ -160,16 +225,6 @@
 			</div>
 		</div>
 
-		<!-- category field -->
-		<div class="w-48">
-			<FormInput
-				fieldName={fieldName.productCategory}
-				labelName="Category"
-				bind:fieldValue={$formFields.productCategory}
-				fieldError={$formErrors.productCategory}
-			/>
-		</div>
-
 		<button
 			class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
 			type="submit"
@@ -178,43 +233,50 @@
 		</button>
 	</form>
 </div>
-<!-- <div>
-	brand name errors : {$formErrors.brandName} <br />
-	product name errors : {$formErrors.productName} <br />
-	price errors : {$formErrors.price} <br />
-	stock errors : {$formErrors.stock}
-</div> -->
-<!-- <button
-	on:click={() => {
-		formFields.set({
-			brandName: 'BRAND',
-			productName: 'PRODUCT',
-			price: 'PRICE',
-			stock: 'STOCK'
-		});
-	}}>TEST</button
-> -->
-<button
-	class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-	on:click={() => {
-		console.log($formFields);
-	}}>console log</button
->
-<form action="?/dummyData" method="post" use:enhance>
+
+<!-- debug -->
+<div>
+	<!-- <div>
+		brand name errors : {$formErrors.brandName} <br />
+		product name errors : {$formErrors.productName} <br />
+		price errors : {$formErrors.price} <br />
+		stock errors : {$formErrors.stock}
+	</div> -->
+	<!-- <button
+		on:click={() => {
+			formFields.set({
+				brandName: 'BRAND',
+				productName: 'PRODUCT',
+				price: 'PRICE',
+				stock: 'STOCK'
+			});
+		}}>TEST</button
+	> -->
 	<button
 		class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-		type="submit">dummyData</button
+		on:click={() => {
+			console.log($formFields);
+		}}>console log</button
 	>
-</form>
-<form action="?/writeTest" method="post" use:enhance>
-	<button
-		class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-		type="submit">writeTest</button
-	>
-</form>
-<form action="?/deleteTest" method="post" use:enhance>
-	<button
-		class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-		type="submit">deleteTest</button
-	>
-</form>
+	<form action="?/dummyData" method="post" use:enhance>
+		<button
+			class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+			type="submit">dummyData</button
+		>
+	</form>
+
+	<div class="flex flex-row space-x-3">
+		<form action="?/writeTest" method="post" use:enhance>
+			<button
+				class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+				type="submit">writeTest</button
+			>
+		</form>
+		<form action="?/deleteTest" method="post" use:enhance>
+			<button
+				class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+				type="submit">deleteTest</button
+			>
+		</form>
+	</div>
+</div>
