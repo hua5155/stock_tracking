@@ -95,7 +95,7 @@ export const load: PageServerLoad = (async ({ params }) => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-  newProduct: async ({ request }) => {
+  createProduct: async ({ request }) => {
     const formData = Object.fromEntries(await request.formData()) as createForm;
     const zResult = createValidator.safeParse(formData);
 

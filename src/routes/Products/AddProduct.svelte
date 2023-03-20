@@ -145,20 +145,18 @@
 
 <!-- AddProduct -->
 <div class="rounded-2xl bg-gray-300 p-9 text-black">
-	<form action="?/newProduct" method="post" use:enhance={submitCreate}>
-		<h3 class="mb-4 text-center text-3xl font-semibold">New product</h3>
-
+	<h3 class="mb-4 text-center text-3xl font-semibold">New product</h3>
+	<form action="?/createProduct" method="post" use:enhance={submitCreate}>
 		<div class="flex flex-row space-x-5">
 			<!-- brand name field -->
-			<div class="w-40">
-				<FormInput
-					fieldName={fieldName.productBrand}
-					labelName="Brand"
-					bind:fieldValue={$formFields.productBrand}
-					fieldError={$formErrors.productBrand}
-					list={brands}
-				/>
-			</div>
+			<FormInput
+				fieldLength="w-40"
+				fieldName={fieldName.productBrand}
+				labelName="Brand"
+				bind:fieldValue={$formFields.productBrand}
+				fieldError={$formErrors.productBrand}
+				list={brands}
+			/>
 
 			<!-- <datalist id="brand-field">
 				{#each brandList as item}
@@ -167,62 +165,57 @@
 			</datalist> -->
 
 			<!-- product name field -->
-			<div class="w-52">
-				<FormInput
-					fieldName={fieldName.productName}
-					labelName="Product"
-					bind:fieldValue={$formFields.productName}
-					fieldError={$formErrors.productName}
-					list={products}
-					onclickFunc={autofillBrand}
-				/>
-			</div>
+			<FormInput
+				fieldLength="w-52"
+				fieldName={fieldName.productName}
+				labelName="Product"
+				bind:fieldValue={$formFields.productName}
+				fieldError={$formErrors.productName}
+				list={products}
+				autoFillAction={autofillBrand}
+			/>
 		</div>
 
 		<div class="flex flex-row space-x-5">
 			<!-- variant name field -->
-			<div class="w-80">
-				<FormInput
-					fieldName={fieldName.productVariant}
-					labelName="Variant"
-					bind:fieldValue={$formFields.productVariant}
-					fieldError={$formErrors.productVariant}
-					list={variants}
-				/>
-			</div>
+			<FormInput
+				fieldLength="w-80"
+				fieldName={fieldName.productVariant}
+				labelName="Variant"
+				bind:fieldValue={$formFields.productVariant}
+				fieldError={$formErrors.productVariant}
+				list={variants}
+			/>
 
 			<!-- category field -->
-			<div class="w-48">
-				<FormInput
-					fieldName={fieldName.productCategory}
-					labelName="Category"
-					bind:fieldValue={$formFields.productCategory}
-					fieldError={$formErrors.productCategory}
-					list={categories}
-				/>
-			</div>
+			<FormInput
+				fieldLength="w-48"
+				fieldName={fieldName.productCategory}
+				labelName="Category"
+				bind:fieldValue={$formFields.productCategory}
+				fieldError={$formErrors.productCategory}
+				list={categories}
+			/>
 		</div>
 
 		<div class="flex flex-row space-x-5">
 			<!-- price name field -->
-			<div class="w-32">
-				<FormInput
-					fieldName={fieldName.price}
-					labelName="Price"
-					bind:fieldValue={$formFields.price}
-					fieldError={$formErrors.price}
-				/>
-			</div>
+			<FormInput
+				fieldLength="w-32"
+				fieldName={fieldName.price}
+				labelName="Price"
+				bind:fieldValue={$formFields.price}
+				fieldError={$formErrors.price}
+			/>
 
 			<!-- stock name field -->
-			<div class="w-32">
-				<FormInput
-					fieldName={fieldName.stock}
-					labelName="Stock"
-					bind:fieldValue={$formFields.stock}
-					fieldError={$formErrors.stock}
-				/>
-			</div>
+			<FormInput
+				fieldLength="w-32"
+				fieldName={fieldName.stock}
+				labelName="Stock"
+				bind:fieldValue={$formFields.stock}
+				fieldError={$formErrors.stock}
+			/>
 		</div>
 
 		<button

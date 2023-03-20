@@ -1,29 +1,50 @@
-<script lang="ts">
-  
+<script context="module" lang="ts">
+	export const dialogFlag = writable(false);
+	export const dialogInfo = writable('');
+	export const brandName = writable('');
 </script>
 
-<div class="p-5 bg-gray-300 rounded-2xl text-black">
-  <form action="?/deleteBrand" method="post">
-    <h3 class="text-3xl font-semibold">Delete brand</h3>
-    <label
-      class="text-xl text-neutral-500"
-      for="brandName"
-    >
-      Brand
-    </label>
-    <div class="flex flex-row space-x-3">
-      <input
-        class="h-10 px-3 pb-1 text-xl rounded-xl"
-        type="text"
-        name="brandName"
-        id="brandName"
-      >
-      <button
-        class="h-10 w-fit px-3 pb-1 text-xl text-white font-semibold bg-cyan-800 rounded-2xl"
-        type="submit"
-      >
-        Delete brand
-      </button>
-    </div>
-  </form>
-</div>
+<script lang="ts">
+	import { enhance, type SubmitFunction } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
+	import { writable } from 'svelte/store';
+
+	const submitDelete: SubmitFunction = ({ form, data, action, cancel }) => {
+		return async ({ result, update }) => {
+			// console.log('result :', result);
+			if (result.type === 'success') {
+				$dialogFlag = false;
+				$dialogInfo = '';
+				$brandName = '';
+				invalidateAll();
+			}
+		};
+	};
+</script>
+
+{#if $dialogFlag === true}
+	<div
+		class="absolute top-0 left-0 z-50 flex h-screen w-screen items-center justify-center bg-white/50"
+		on:click|self={() => {
+			$dialogFlag = false;
+			$dialogInfo = '';
+			$brandName = '';
+		}}
+		on:keydown={() => {}}
+	>
+		<div class="h-fit w-fit rounded-2xl bg-gray-300 p-9 text-black">
+			<h3 class="mb-4 text-center text-3xl font-semibold">
+				You're about to delete {$dialogInfo} and all products it has.
+			</h3>
+			<span class="text-xl">Are you sure?</span>
+			<form action="?/deleteBrand&brandName={$brandName}" method="post" use:enhance={submitDelete}>
+				<button
+					class="h-10 w-fit rounded-lg bg-red-800 px-3 pb-1 text-xl font-semibold text-white"
+					type="submit"
+				>
+					Confirm
+				</button>
+			</form>
+		</div>
+	</div>
+{/if}

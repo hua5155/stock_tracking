@@ -1,8 +1,6 @@
 <script lang="ts">
-	export let fieldName: string;
 	export let labelName: string;
 	export let fieldValue: string;
-	export let fieldError: string;
 	export let fieldLength = '';
 	export let list = [''];
 	export let autoFillAction = () => {};
@@ -19,31 +17,13 @@
 </script>
 
 <div class="relative flex flex-col {fieldLength}">
-	<label for={fieldName}>
-		<span
-			class="z-10 text-xl text-neutral-500
-				{fieldError ?? true ? 'text-pink-600' : 'text-neutral-500'}"
-		>
-			{labelName}
-		</span>
-	</label>
 	<input
-		class="peer z-10 h-10 rounded-xl border-2 px-3 pb-1 text-xl placeholder:text-pink-600 focus:outline-none
-			{fieldError ?? true
-			? 'border-pink-300 text-pink-600 focus:border-pink-500'
-			: 'border-sky-300 focus:border-sky-500'}"
+		class="peer z-10 h-10 rounded-xl border-2 border-sky-300 px-3 pb-1 text-xl text-black focus:border-sky-500 focus:outline-none"
 		type="text"
-		name={fieldName}
-		id={fieldName}
 		bind:value={fieldValue}
-		placeholder={fieldError}
+		placeholder={labelName}
 		on:focusin={() => {
 			focusFlag = true;
-		}}
-		on:focusout={() => {
-			// setTimeout(() => {
-			// 	focusFlag = false;
-			// }, 100);
 		}}
 		on:keydown={(event) => {
 			// if (event.key === 'ArrowUp') console.log('UP');

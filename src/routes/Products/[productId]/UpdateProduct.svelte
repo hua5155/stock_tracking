@@ -118,37 +118,34 @@
 				</span>
 			</div>
 			<!-- category field -->
-			<div class="w-48">
-				<FormInput
-					fieldName={fieldName.productCategory}
-					labelName="Variant"
-					bind:fieldValue={$formFields.productCategory}
-					fieldError={$formErrors.productCategory}
-					list={categories}
-				/>
-			</div>
+			<FormInput
+				fieldLength="w-48"
+				fieldName={fieldName.productCategory}
+				labelName="Variant"
+				bind:fieldValue={$formFields.productCategory}
+				fieldError={$formErrors.productCategory}
+				list={categories}
+			/>
 		</div>
 
 		<div class="flex flex-row space-x-5">
 			<!-- price name field -->
-			<div class="w-32">
-				<FormInput
-					fieldName={fieldName.price}
-					labelName="Price"
-					bind:fieldValue={$formFields.price}
-					fieldError={$formErrors.price}
-				/>
-			</div>
+			<FormInput
+				fieldLength="w-32"
+				fieldName={fieldName.price}
+				labelName="Price"
+				bind:fieldValue={$formFields.price}
+				fieldError={$formErrors.price}
+			/>
 
 			<!-- stock name field -->
-			<div class="w-32">
-				<FormInput
-					fieldName={fieldName.stock}
-					labelName="Stock"
-					bind:fieldValue={$formFields.stock}
-					fieldError={$formErrors.stock}
-				/>
-			</div>
+			<FormInput
+				fieldLength="w-32"
+				fieldName={fieldName.stock}
+				labelName="Stock"
+				bind:fieldValue={$formFields.stock}
+				fieldError={$formErrors.stock}
+			/>
 		</div>
 
 		<button
