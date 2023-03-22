@@ -43,10 +43,9 @@
 	};
 </script>
 
-<div class="rounded-2xl bg-gray-300 p-5 text-black">
+<div class="h-fit w-fit rounded-2xl bg-gray-300 p-5 text-black">
+	<h3 class="text-3xl font-semibold">New brand</h3>
 	<form action="?/createBrand" method="post" use:enhance={submitCreate}>
-		<h3 class="text-3xl font-semibold">New brand</h3>
-		<!-- <label class="text-xl text-neutral-500" for="brandName"> Brand </label> -->
 		<div class="flex flex-row items-end space-x-3">
 			<FormInput
 				fieldName={fieldName.brandName}

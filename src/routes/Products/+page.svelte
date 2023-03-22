@@ -1,8 +1,7 @@
 <script lang="ts">
 	import AddProduct from './AddProduct.svelte';
-	import DeleteProduct from './DeleteProduct.svelte';
 	import FilterInput from './FilterInput.svelte';
-	import { dialogFlag, dialogInfo, productId } from './DeleteProduct.svelte';
+	import DeleteDialog from '$lib/conponents/DeleteDialog.svelte';
 
 	import type { PageData, ActionData } from './$types';
 	import { writable } from 'svelte/store';
@@ -13,6 +12,10 @@
 	export let data: PageData;
 	// export let form: ActionData;
 	// $: console.log('pageData :\n', data);
+
+	const deleteFlag = writable(false);
+	const message = writable('');
+	const target = writable('');
 
 	const brandFilter = writable('');
 	const productFilter = writable('');
@@ -70,17 +73,40 @@
 </script>
 
 <main class="flex h-full w-full justify-center bg-gray-800">
-	<DeleteProduct />
+	<DeleteDialog
+		bind:dialogFlag={$deleteFlag}
+		action="?/deleteProduct&productId={$target}"
+		message={$message}
+	/>
 
-	<div class="flex h-fit w-fit flex-col">
-		<AddProduct {data} />
-	</div>
+	<AddProduct {data} />
+	<!-- <form action="?/dummyData" method="post" use:enhance>
+		<button
+			class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold"
+			type="submit">dummyData</button
+		>
+	</form> -->
 
-	<div class="no-scrollbar flex h-4/5 w-2/5 flex-col space-y-2 overflow-auto">
-		<div class="flex flex-row space-x-5">
-			<FilterInput bind:fieldValue={$brandFilter} labelName="Brand" list={brands} />
-			<FilterInput bind:fieldValue={$productFilter} labelName="Product" list={products} />
-			<FilterInput bind:fieldValue={$variantFilter} labelName="Variant" list={variants} />
+	<div class="no-scrollbar flex h-5/6 w-2/5 flex-col space-y-2 overflow-auto">
+		<div class="flex w-full flex-row justify-between space-x-5">
+			<FilterInput
+				bind:fieldValue={$brandFilter}
+				labelName="Brand"
+				list={brands}
+				fieldLength="w-80"
+			/>
+			<FilterInput
+				bind:fieldValue={$productFilter}
+				labelName="Product"
+				list={products}
+				fieldLength="w-80"
+			/>
+			<FilterInput
+				bind:fieldValue={$variantFilter}
+				labelName="Variant"
+				list={variants}
+				fieldLength="w-80"
+			/>
 		</div>
 		{#each listing as product}
 			<div
@@ -112,10 +138,14 @@
 						class="h-10 w-fit rounded-lg bg-red-800 px-3 pb-1 text-xl font-semibold"
 						type="button"
 						on:click={() => {
-							$dialogFlag = true;
-							$dialogInfo =
-								product.productBrand + ' ' + product.productName + ' ' + product.productVariant;
-							$productId = product.id;
+							// $dialogFlag = true;
+							// $dialogInfo =
+							// 	product.productBrand + ' ' + product.productName + ' ' + product.productVariant;
+							// $productId = product.id;
+
+							$deleteFlag = true;
+							$message = `You're about to delete ${product.productBrand} ${product.productName} ${product.productVariant}`;
+							$target = product.id;
 						}}
 						>Delete
 					</button>

@@ -1,18 +1,24 @@
 <script lang="ts">
 	import AddBrand from './AddBrand.svelte';
-	import DeleteBrand from './DeleteBrand.svelte';
-	import { dialogFlag, dialogInfo, brandName } from './DeleteBrand.svelte';
+	import DeleteDialog from '$lib/conponents/DeleteDialog.svelte';
 
 	import type { PageData } from './$types';
+	import { writable } from 'svelte/store';
 
 	export let data: PageData;
+
+	const deleteFlag = writable(false);
+	const target = writable('');
 </script>
 
 <main class="flex justify-center bg-gray-800">
-	<DeleteBrand />
-	<div class="flex h-fit w-fit flex-col">
-		<AddBrand {data} />
-	</div>
+	<!-- <DeleteBrand /> -->
+	<DeleteDialog
+		bind:dialogFlag={$deleteFlag}
+		action="?/deleteBrand&brandName={$target}"
+		message="You're about to delete {$target} and all products it has."
+	/>
+	<AddBrand {data} />
 
 	<div class="no-scrollbar flex h-4/5 w-2/5 flex-col space-y-2 overflow-auto">
 		{#each data.brands as brand}
@@ -33,9 +39,12 @@
 						class="h-10 w-fit rounded-lg bg-red-800 px-3 pb-1 text-xl font-semibold text-white"
 						type="button"
 						on:click={() => {
-							$dialogFlag = true;
-							$dialogInfo = brand.brandName;
-							$brandName = brand.brandName;
+							// $dialogFlag = true;
+							// $dialogInfo = brand.brandName;
+							// $brandName = brand.brandName;
+
+							$deleteFlag = true;
+							$target = brand.brandName;
 						}}
 						>Delete
 					</button>

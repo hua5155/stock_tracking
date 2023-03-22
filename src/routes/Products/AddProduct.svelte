@@ -144,7 +144,7 @@
 </script>
 
 <!-- AddProduct -->
-<div class="rounded-2xl bg-gray-300 p-9 text-black">
+<div class="h-fit w-fit rounded-2xl bg-gray-300 p-9 text-black">
 	<h3 class="mb-4 text-center text-3xl font-semibold">New product</h3>
 	<form action="?/createProduct" method="post" use:enhance={submitCreate}>
 		<div class="flex flex-row space-x-5">
@@ -225,51 +225,4 @@
 			Add product
 		</button>
 	</form>
-</div>
-
-<!-- debug -->
-<div>
-	<!-- <div>
-		brand name errors : {$formErrors.brandName} <br />
-		product name errors : {$formErrors.productName} <br />
-		price errors : {$formErrors.price} <br />
-		stock errors : {$formErrors.stock}
-	</div> -->
-	<!-- <button
-		on:click={() => {
-			formFields.set({
-				brandName: 'BRAND',
-				productName: 'PRODUCT',
-				price: 'PRICE',
-				stock: 'STOCK'
-			});
-		}}>TEST</button
-	> -->
-	<button
-		class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-		on:click={() => {
-			console.log($formFields);
-		}}>console log</button
-	>
-	<form action="?/dummyData" method="post" use:enhance>
-		<button
-			class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-			type="submit">dummyData</button
-		>
-	</form>
-
-	<div class="flex flex-row space-x-3">
-		<form action="?/writeTest" method="post" use:enhance>
-			<button
-				class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-				type="submit">writeTest</button
-			>
-		</form>
-		<form action="?/deleteTest" method="post" use:enhance>
-			<button
-				class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-				type="submit">deleteTest</button
-			>
-		</form>
-	</div>
 </div>
