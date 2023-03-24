@@ -1,13 +1,11 @@
 <script lang="ts">
-	import AddProduct from './AddProduct.svelte';
+	import CreateDialog from './CreateDialog.svelte';
 	import FilterInput from './FilterInput.svelte';
 	import DeleteDialog from '$lib/conponents/DeleteDialog.svelte';
 
-	import type { PageData, ActionData } from './$types';
+	import type { PageData } from './$types';
 	import { writable } from 'svelte/store';
-	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import { z } from 'zod';
 
 	export let data: PageData;
 	// export let form: ActionData;
@@ -16,6 +14,7 @@
 	const deleteFlag = writable(false);
 	const message = writable('');
 	const target = writable('');
+	const createFlag = writable(false);
 
 	const brandFilter = writable('');
 	const productFilter = writable('');
@@ -72,14 +71,14 @@
 	};
 </script>
 
-<main class="flex h-full w-full justify-center bg-gray-800">
+<main class="flex h-full w-full flex-col items-center bg-gray-800">
 	<DeleteDialog
 		bind:dialogFlag={$deleteFlag}
 		action="?/deleteProduct&productId={$target}"
 		message={$message}
 	/>
 
-	<AddProduct {data} />
+	<CreateDialog {data} bind:dialogFlag={$createFlag} />
 	<!-- <form action="?/dummyData" method="post" use:enhance>
 		<button
 			class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold"
@@ -87,27 +86,40 @@
 		>
 	</form> -->
 
-	<div class="no-scrollbar flex h-5/6 w-2/5 flex-col space-y-2 overflow-auto">
-		<div class="flex w-full flex-row justify-between space-x-5">
-			<FilterInput
-				bind:fieldValue={$brandFilter}
-				labelName="Brand"
-				list={brands}
-				fieldLength="w-80"
-			/>
-			<FilterInput
-				bind:fieldValue={$productFilter}
-				labelName="Product"
-				list={products}
-				fieldLength="w-80"
-			/>
-			<FilterInput
-				bind:fieldValue={$variantFilter}
-				labelName="Variant"
-				list={variants}
-				fieldLength="w-80"
-			/>
-		</div>
+	<!-- Filter bar -->
+	<div class="flex w-2/5 flex-row justify-between bg-gray-800">
+		<FilterInput
+			bind:fieldValue={$brandFilter}
+			labelName="Brand"
+			list={brands}
+			fieldLength="w-80"
+		/>
+		<FilterInput
+			bind:fieldValue={$productFilter}
+			labelName="Product"
+			list={products}
+			fieldLength="w-80"
+		/>
+		<FilterInput
+			bind:fieldValue={$variantFilter}
+			labelName="Variant"
+			list={variants}
+			fieldLength="w-80"
+		/>
+	</div>
+	<!-- createProduct button -->
+	<div class="w-2/5">
+		<button
+			class="mt-2 h-14 w-full rounded-lg bg-gray-500 px-4 py-2 text-left text-base font-bold"
+			on:click={() => {
+				$createFlag = true;
+			}}
+		>
+			+ New Product
+		</button>
+	</div>
+	<!-- Product listing -->
+	<div class="no-scrollbar mt-2 flex h-5/6 w-2/5 flex-col space-y-2 overflow-auto">
 		{#each listing as product}
 			<div
 				class="flex flex-row items-center justify-between space-x-5 rounded-lg bg-gray-500 py-2 px-4"
@@ -132,23 +144,16 @@
 						role="button"
 						>Edit
 					</a>
-					<!-- <form action="?/testAction&productId={product.id}" method="post" use:enhance>
-					</form> -->
-					<button
+					<!-- <button
 						class="h-10 w-fit rounded-lg bg-red-800 px-3 pb-1 text-xl font-semibold"
 						type="button"
 						on:click={() => {
-							// $dialogFlag = true;
-							// $dialogInfo =
-							// 	product.productBrand + ' ' + product.productName + ' ' + product.productVariant;
-							// $productId = product.id;
-
 							$deleteFlag = true;
 							$message = `You're about to delete ${product.productBrand} ${product.productName} ${product.productVariant}`;
 							$target = product.id;
 						}}
 						>Delete
-					</button>
+					</button> -->
 				</div>
 			</div>
 		{/each}

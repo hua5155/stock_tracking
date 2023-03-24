@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AddBrand from './AddBrand.svelte';
+	import CreateDialog from './CreateDialog.svelte';
 	import DeleteDialog from '$lib/conponents/DeleteDialog.svelte';
 
 	import type { PageData } from './$types';
@@ -9,18 +9,28 @@
 
 	const deleteFlag = writable(false);
 	const target = writable('');
+	const createFlag = writable(false);
 </script>
 
-<main class="flex justify-center bg-gray-800">
-	<!-- <DeleteBrand /> -->
+<main class="full flex w-full flex-col items-center bg-gray-800">
 	<DeleteDialog
 		bind:dialogFlag={$deleteFlag}
 		action="?/deleteBrand&brandName={$target}"
 		message="You're about to delete {$target} and all products it has."
 	/>
-	<AddBrand {data} />
+	<CreateDialog {data} bind:dialogFlag={$createFlag} />
 
-	<div class="no-scrollbar flex h-4/5 w-2/5 flex-col space-y-2 overflow-auto">
+	<div class="w-2/5">
+		<button
+			class="mt-2 h-14 w-full rounded-lg bg-gray-500 px-4 py-2 text-left text-base font-bold"
+			on:click={() => {
+				$createFlag = true;
+			}}
+		>
+			+ New Product
+		</button>
+	</div>
+	<div class="no-scrollbar mt-2 flex h-4/5 w-2/5 flex-col space-y-2 overflow-auto">
 		{#each data.brands as brand}
 			<div
 				class="flex flex-row items-center justify-between space-x-5 rounded-lg bg-gray-500 py-2 px-4"
@@ -39,10 +49,6 @@
 						class="h-10 w-fit rounded-lg bg-red-800 px-3 pb-1 text-xl font-semibold text-white"
 						type="button"
 						on:click={() => {
-							// $dialogFlag = true;
-							// $dialogInfo = brand.brandName;
-							// $brandName = brand.brandName;
-
 							$deleteFlag = true;
 							$target = brand.brandName;
 						}}

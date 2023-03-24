@@ -8,6 +8,7 @@
 
 	const submitDelete: SubmitFunction = () => {
 		return async ({ result }) => {
+			console.log('result :\n', result); // debug
 			if (result.type === 'success') {
 				dialogFlag = false;
 				invalidateAll();

@@ -2,11 +2,11 @@ import type { Actions, PageServerLoad } from "./$types";
 import { error, fail } from "@sveltejs/kit";
 import { prisma } from "$lib/server/prisma";
 import { Prisma } from '@prisma/client'
-import type { z } from 'zod'
+import { z } from 'zod'
 
-import { formValidator as updateValidator } from "./UpdateProduct.svelte"
+import { formValidator as updateValidator } from "./EditProduct.svelte"
 type updateSchema = z.infer<typeof updateValidator>
-import type { formType as updateForm } from "./UpdateProduct.svelte"
+import type { formType as updateForm } from "./EditProduct.svelte"
 
 const updateProduct = async (data: updateSchema, productId: string) => {
   await prisma.product.update({
@@ -23,11 +23,19 @@ const updateProduct = async (data: updateSchema, productId: string) => {
     }
   })
 }
+const deleteProduct = async (productId: string) => {
+  await prisma.product.delete({
+    where: {
+      id: productId
+    }
+  })
+}
 
 export const load: PageServerLoad = async ({ params }) => {
   const product = prisma.product.findUnique({
     where: { id: params.productId },
     select: {
+      id: true,
       productBrand: true,
       productName: true,
       productCategory: true,
@@ -60,10 +68,13 @@ export const load: PageServerLoad = async ({ params }) => {
     }
   }
 
-  // console.log('server :\n', product) // debug
-  if (product === null) {
-    throw error(404, 'Product not found')
-  }
+  // console.log('product :', product) // debug
+  // if (product === null) {
+  //   console.log('Product not found') // debug
+  //   throw error(404, 'Product not found')
+  // }
+
+  console.log('serverload')
 
   return {
     product: product,
@@ -101,6 +112,35 @@ export const actions: Actions = {
         console.log(error.message);
       }
       return fail(500, { message: "Something went wrong, Couldn't create the product." });
+    }
+  },
+  deleteProduct: async ({ url }) => {
+    const validator = z.string().uuid({ message: 'Not UUID' })
+    const productId = url.searchParams.get('productId')
+    if (productId === null) return fail(500, { message: "Parameter : productId missing." });
+
+    const zResult = validator.safeParse(productId)
+    if (zResult.success === false) {
+      const { fieldErrors: zErrors } = zResult.error.flatten();
+      console.log("server-side validation error :\n", zResult.error);  // debug
+      console.log("data :", productId);  // debug
+      return fail(400, {
+        error: zErrors,
+      });
+    } else {
+      console.log("server-side validation :", zResult);  // debug
+    }
+
+    try {
+      deleteProduct(zResult.data);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        console.log('Error code : ' + error.code);
+      }
+      if (error instanceof Prisma.PrismaClientUnknownRequestError) {
+        console.log(error.message);
+      }
+      return fail(500, { message: "Something went wrong, Couldn't delete the brand." });
     }
   }
 };

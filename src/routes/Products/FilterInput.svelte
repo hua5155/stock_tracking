@@ -6,14 +6,15 @@
 	export let autoFillAction = () => {};
 
 	let focusFlag = false;
-	$: inFocus = focusFlag ? 'visible' : 'invisible';
+	let autoFillSelect = 0;
 
 	$: options = list.filter((ele) => {
 		return ele.toLowerCase().includes(fieldValue.toLowerCase());
 	});
-	$: listFlag = options.length === 0 || list[0] === '' ? false : true;
-	// $: listFlag = list.indexOf(fieldValue) > -1 ? true : false;
+	$: diaplayFlag = options.length === 0 || list[0] === '' ? false : true;
+	// $: diaplayFlag = list.indexOf(fieldValue) > -1 ? true : false;
 	// $: listHeight = 40 * options.length;
+	$: inFocus = focusFlag ? 'visible' : 'invisible';
 </script>
 
 <div class="relative flex flex-col {fieldLength}">
@@ -25,21 +26,42 @@
 		on:focusin={() => {
 			focusFlag = true;
 		}}
+		on:focusout={() => {
+			autoFillSelect = 0;
+			setTimeout(() => {
+				focusFlag = false;
+			}, 300);
+		}}
 		on:keydown={(event) => {
-			// if (event.key === 'ArrowUp') console.log('UP');
-			// if (event.key === 'ArrowDown') console.log('DOWN');
-			// if (event.key === 'ArrowLeft') console.log('LEFT');
-			// if (event.key === 'ArrowRight') console.log('RIGHT');
+			// console.log('key : ', event.key); // debug
+			if (event.key === 'ArrowUp') {
+				console.log('UP'); // debug
+				autoFillSelect = autoFillSelect <= 0 ? 0 : autoFillSelect - 1;
+				console.log('index : ', autoFillSelect); // debug
+			}
+			if (event.key === 'ArrowDown') {
+				console.log('DOWN'); // debug
+				autoFillSelect = autoFillSelect >= options.length ? options.length : autoFillSelect + 1;
+				console.log('index : ', autoFillSelect); // debug
+			}
+			if (event.key === 'Enter') {
+				console.log('Enter'); // debug
+				if (autoFillSelect === 0) return;
+				fieldValue = options[autoFillSelect - 1];
+			}
+		}}
+		on:input={() => {
+			autoFillSelect = 0;
 		}}
 	/>
-	{#if listFlag}
+	{#if diaplayFlag === true}
 		<ul
-			class="no-scrollbar absolute top-[72px] left-0 z-20 h-fit max-h-40 w-fit space-y-1 overflow-y-auto rounded-xl bg-blue-500/0 py-1 px-3 text-gray-800/0 transition-colors duration-300 peer-focus:bg-blue-500 peer-focus:text-gray-800
+			class="no-scrollbar absolute top-11 left-0 z-20 h-fit max-h-40 w-fit space-y-1 overflow-y-auto rounded-lg bg-blue-500/0 py-1 text-gray-800/0 transition-colors duration-300 peer-focus:bg-blue-500 peer-focus:text-gray-800
 			{inFocus}"
 		>
-			{#each options as item}
+			{#each options as item, index}
 				<li
-					class="h-6 w-full"
+					class="h-6 w-full px-3 {index === autoFillSelect - 1 ? 'bg-blue-600' : ''}"
 					on:click={() => {
 						fieldValue = item;
 						focusFlag = false;

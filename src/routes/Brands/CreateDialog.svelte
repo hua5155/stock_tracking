@@ -10,14 +10,16 @@
 
 <script lang="ts">
 	import { enhance, type SubmitFunction } from '$app/forms';
+	import type { PageData } from './$types';
 	import { writable } from 'svelte/store';
 	import { invalidateAll } from '$app/navigation';
 	import { z } from 'zod';
 
 	import FormInput from '$lib/conponents/FormInput.svelte';
 
-	import type { PageData } from './$types';
 	export let data: PageData;
+	export let dialogFlag = false;
+
 	$: brands = data.brands.map((ele) => ele.brandName);
 
 	const formFields = writable<formType>({ brandName: '' });
@@ -37,29 +39,44 @@
 			// console.log('result :', result);
 			if (result.type === 'success') {
 				$formFields.brandName = '';
+				dialogFlag = false;
+				// await update();
 				invalidateAll();
 			}
 		};
 	};
 </script>
 
-<div class="h-fit w-fit rounded-2xl bg-gray-300 p-5 text-black">
-	<h3 class="text-3xl font-semibold">New brand</h3>
-	<form action="?/createBrand" method="post" use:enhance={submitCreate}>
-		<div class="flex flex-row items-end space-x-3">
-			<FormInput
-				fieldName={fieldName.brandName}
-				labelName="Brand"
-				bind:fieldValue={$formFields.brandName}
-				fieldError={$formErrors.brandName}
-				list={brands}
-			/>
-			<button
-				class="h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-				type="submit"
+{#if dialogFlag === true}
+	<div
+		class="absolute top-0 left-0 z-50 flex h-screen w-screen items-center justify-center bg-white/50"
+		on:click|self={() => {
+			dialogFlag = false;
+		}}
+		on:keydown={() => {}}
+	>
+		<div class="h-fit w-fit rounded-2xl bg-gray-300 p-5 text-black">
+			<h3 class="text-3xl font-semibold">New brand</h3>
+			<form
+				action="?/createBrand"
+				method="post"
+				use:enhance={submitCreate}
+				class="flex flex-row items-end space-x-3"
 			>
-				Add brand
-			</button>
+				<FormInput
+					fieldName={fieldName.brandName}
+					labelName="Brand"
+					bind:fieldValue={$formFields.brandName}
+					fieldError={$formErrors.brandName}
+					list={brands}
+				/>
+				<button
+					class="h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+					type="submit"
+				>
+					Add brand
+				</button>
+			</form>
 		</div>
-	</form>
-</div>
+	</div>
+{/if}

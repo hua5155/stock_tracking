@@ -4,8 +4,8 @@ import { fail } from "@sveltejs/kit";
 import { prisma } from "$lib/server/prisma";
 import { Prisma } from '@prisma/client'
 
-import type { formType as createForm } from './AddBrand.svelte'
-import { formSchema as createValidator } from './AddBrand.svelte'
+import { formSchema as createValidator } from './CreateDialog.svelte'
+// import type { formType as createForm } from './CreateDialog.svelte'
 
 export const load: PageServerLoad = async () => {
   const brands = prisma.brand.findMany({
@@ -48,7 +48,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
   createBrand: async ({ request }) => {
-    const formData = Object.fromEntries(await request.formData()) as createForm;
+    const formData = Object.fromEntries(await request.formData());
     const zResult = createValidator.safeParse(formData);
 
     if (zResult.success === false) {

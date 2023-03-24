@@ -20,24 +20,27 @@
 </script>
 
 <script lang="ts">
-	import { enhance, type SubmitFunction } from '$app/forms';
-	import { writable } from 'svelte/store';
+	import FormInput from '$lib/conponents/FormInput.svelte';
+	import DeleteDialog from '$lib/conponents/DeleteDialog.svelte';
+
 	import type { PageData } from './$types';
+	import { enhance, type SubmitFunction } from '$app/forms';
+	import { goto, invalidateAll } from '$app/navigation';
+	import { writable } from 'svelte/store';
 
 	import { z } from 'zod';
 
-	import FormInput from '$lib/conponents/FormInput.svelte';
-	import { invalidateAll } from '$app/navigation';
-
 	export let data: PageData;
-	const { product } = data;
+	$: ({ product } = data);
+	$: if (product === null) {
+		goto('/Products');
+	}
+	// const { product } = data;
 	const categories = data.categories.map((item) => item.categoryName);
 
-	const formFields = writable<formType>({
-		productCategory: product?.productCategory ?? '',
-		price: product?.price.toString() ?? '0',
-		stock: product?.stock.toString() ?? '0'
-	});
+	const deleteFlag = writable(false);
+	const target = writable('');
+	const message = writable('');
 
 	const formErrors = writable<formType>({
 		productCategory: '',
@@ -55,9 +58,6 @@
 		if (zResult.success === false) {
 			const { fieldErrors: zErrors } = zResult.error.flatten();
 			console.log('client-side validation error :\n', zErrors); // debug
-			$formFields.price = zErrors.price !== undefined ? '' : formData.price;
-			$formFields.stock = zErrors.stock !== undefined ? '' : formData.stock;
-			console.log('formFields :\n', $formFields); // debug
 			formErrors.set({
 				productCategory: zErrors.productCategory?.at(0) ?? '',
 				price: zErrors.price?.at(0) ?? '',
@@ -73,19 +73,22 @@
 			// console.log('result.error :', result.data.error);
 
 			if (result.type === 'success') {
-				// console.log('formFields :\n', $formFields); // debug
 				formErrors.set({
 					productCategory: '',
 					price: '',
 					stock: ''
 				});
-				// await update();
-				// await applyAction(result);
 				invalidateAll();
 			}
 		};
 	};
 </script>
+
+<DeleteDialog
+	bind:dialogFlag={$deleteFlag}
+	action="?/deleteProduct&productId={$target}"
+	message={$message}
+/>
 
 <div class="rounded-2xl bg-gray-300 p-9 text-black">
 	<form action="?/updateProduct" method="post" use:enhance={submitCreate}>
@@ -122,7 +125,7 @@
 				fieldLength="w-48"
 				fieldName={fieldName.productCategory}
 				labelName="Variant"
-				bind:fieldValue={$formFields.productCategory}
+				fieldValue={product?.productCategory ?? ''}
 				fieldError={$formErrors.productCategory}
 				list={categories}
 			/>
@@ -134,7 +137,7 @@
 				fieldLength="w-32"
 				fieldName={fieldName.price}
 				labelName="Price"
-				bind:fieldValue={$formFields.price}
+				fieldValue={product?.price.toString() ?? ''}
 				fieldError={$formErrors.price}
 			/>
 
@@ -143,16 +146,30 @@
 				fieldLength="w-32"
 				fieldName={fieldName.stock}
 				labelName="Stock"
-				bind:fieldValue={$formFields.stock}
+				fieldValue={product?.stock.toString() ?? ''}
 				fieldError={$formErrors.stock}
 			/>
 		</div>
 
-		<button
-			class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-			type="submit"
-		>
-			Commit edit
-		</button>
+		<div class="mt-5 flex w-full flex-row justify-between">
+			<button
+				class="h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+				type="submit"
+			>
+				Commit edit
+			</button>
+			<button
+				class=" h-10 w-fit rounded-2xl bg-red-800 px-3 pb-1 text-xl font-semibold text-white"
+				type="button"
+				on:click={() => {
+					$deleteFlag = true;
+					$message = `You're about to delete ${product?.productBrand} ${product?.productName} ${product?.productVariant}`;
+					$target = product?.id ?? '';
+					// goto('/Products');
+				}}
+			>
+				Delete
+			</button>
+		</div>
 	</form>
 </div>
