@@ -22,6 +22,7 @@
 <script lang="ts">
 	import FormInput from '$lib/conponents/FormInput.svelte';
 	import DeleteDialog from '$lib/conponents/DeleteDialog.svelte';
+	import LoadingAnimation from '$lib/conponents/LoadingAnimation.svelte';
 
 	import type { PageData } from './$types';
 	import { enhance, type SubmitFunction } from '$app/forms';
@@ -41,6 +42,8 @@
 	const deleteFlag = writable(false);
 	const target = writable('');
 	const message = writable('');
+
+	const submitFlag = writable(false);
 
 	const formErrors = writable<formType>({
 		productCategory: '',
@@ -67,10 +70,6 @@
 		}
 		return async ({ result, update }) => {
 			console.log('result :', result);
-			// console.log('result.type :', result.type);
-			// console.log('result.status :', result.status);
-			// console.log('result.data :', result.data.data);
-			// console.log('result.error :', result.data.error);
 
 			if (result.type === 'success') {
 				formErrors.set({
@@ -78,6 +77,9 @@
 					price: '',
 					stock: ''
 				});
+				setTimeout(() => {
+					$submitFlag = false;
+				}, 700);
 				invalidateAll();
 			}
 		};
@@ -153,10 +155,19 @@
 
 		<div class="mt-5 flex w-full flex-row justify-between">
 			<button
-				class="h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+				class="relative h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white transition-all duration-300 disabled:bg-cyan-800/75"
 				type="submit"
+				disabled={$submitFlag}
+				on:click={() => {
+					$submitFlag = true;
+				}}
 			>
-				Commit edit
+				<div class="absolute top-0 left-0 h-10 w-10">
+					<LoadingAnimation flag={$submitFlag} />
+				</div>
+				<span class="{$submitFlag ? 'pl-7' : 'pl-0'} transition-all duration-[400ms]">
+					Commit edit
+				</span>
 			</button>
 			<button
 				class=" h-10 w-fit rounded-2xl bg-red-800 px-3 pb-1 text-xl font-semibold text-white"
@@ -165,7 +176,8 @@
 					$deleteFlag = true;
 					$message = `You're about to delete ${product?.productBrand} ${product?.productName} ${product?.productVariant}`;
 					$target = product?.id ?? '';
-					// goto('/Products');
+
+					$submitFlag = true;
 				}}
 			>
 				Delete

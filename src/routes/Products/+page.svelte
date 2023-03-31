@@ -1,7 +1,8 @@
 <script lang="ts">
 	import CreateDialog from './CreateDialog.svelte';
-	import FilterInput from './FilterInput.svelte';
 	import DeleteDialog from '$lib/conponents/DeleteDialog.svelte';
+	import FilterInput from './FilterInput.svelte';
+	import { cart, addToCart } from '$lib/conponents/Cart.svelte';
 
 	import type { PageData } from './$types';
 	import { writable } from 'svelte/store';
@@ -20,9 +21,7 @@
 	const productFilter = writable('');
 	const variantFilter = writable('');
 	$: $brandFilter = $page.url.searchParams.get('productBrand') ?? '';
-
 	$: listing = listingFiltering(data, $brandFilter, $productFilter, $variantFilter);
-
 	$: brands = data.brands.map((item) => item.brandName);
 	$: products = productFiltering(data, $brandFilter);
 	$: variants = variantFiltering(data, $productFilter);
@@ -154,6 +153,16 @@
 						}}
 						>Delete
 					</button> -->
+					<button
+						class="h-10 w-fit rounded-lg bg-sky-800 px-3 pb-1 text-xl font-semibold"
+						type="button"
+						on:click={() => {
+							const { stock, productCategory, ...rest } = product;
+							addToCart(rest);
+							console.log($cart);
+						}}
+						>Add to cart
+					</button>
 				</div>
 			</div>
 		{/each}

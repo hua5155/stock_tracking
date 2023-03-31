@@ -59,12 +59,6 @@
 				autoFillSelect = autoFillSelect >= options.length ? options.length : autoFillSelect + 1;
 				console.log('index : ', autoFillSelect); // debug
 			}
-			if (event.key === 'Enter') {
-				console.log('Enter'); // debug
-				if (autoFillSelect === 0) return;
-				fieldValue = options[autoFillSelect - 1];
-				autoFillAction();
-			}
 		}}
 		on:input={() => {
 			autoFillSelect = 0;

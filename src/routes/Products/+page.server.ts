@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from "./$types";
 import { fail } from "@sveltejs/kit";
 import { prisma } from "$lib/server/prisma";
 import { Prisma } from '@prisma/client'
-import { z } from "zod"
+import type { z } from "zod"
 
 import { formValidator as createValidator } from "./CreateDialog.svelte"
 type createSchema = z.infer<typeof createValidator>
@@ -204,43 +204,5 @@ export const actions: Actions = {
         console.log(error.message);
       }
     }
-  },
-  testAction: async ({ request, url }) => {
-    const validator = z.object({
-      field1: z.string().min(1, { message: 'Empty field' }).trim(),
-      field2: z.coerce.number().min(0, { message: 'Less then 0' })
-    });
-
-    const formData = Object.fromEntries(await request.formData());
-    // const zResult = createValidator.safeParse(formData);
-    const zResult = validator.safeParse(formData);
-
-    if (zResult.success === false) {
-      const { fieldErrors: zErrors } = zResult.error.flatten();
-      const { ...returnData } = formData;
-      console.log("server-side validation error :\n", zErrors);  // debug
-      console.log("returnData :\n", returnData);  // debug
-      return fail(400, {
-        error: zErrors
-      });
-    } else {
-      console.log("server-side validation :", zResult);  // debug
-      return {
-        field1: 'foobar',
-        field2: '10'
-      }
-    }
-
-    // try {
-    //   createProduct(zResult.data);
-    // } catch (error) {
-    //   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    //     console.log('Error code : ' + error.code);  // debug
-    //   }
-    //   if (error instanceof Prisma.PrismaClientUnknownRequestError) {
-    //     console.log(error.message);
-    //   }
-    //   return fail(500, { message: "Something went wrong, Couldn't create the product." });
-    // }
   }
 };
