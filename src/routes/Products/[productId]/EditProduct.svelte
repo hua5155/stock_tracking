@@ -86,12 +86,6 @@
 	};
 </script>
 
-<DeleteDialog
-	bind:dialogFlag={$deleteFlag}
-	action="?/deleteProduct&productId={$target}"
-	message={$message}
-/>
-
 <div class="rounded-2xl bg-gray-300 p-9 text-black">
 	<form action="?/updateProduct" method="post" use:enhance={submitCreate}>
 		<h3 class="mb-4 text-center text-3xl font-semibold">Edit product</h3>
@@ -185,3 +179,13 @@
 		</div>
 	</form>
 </div>
+
+<DeleteDialog
+	bind:dialogFlag={$deleteFlag}
+	action="?/deleteProduct&productId={$target}"
+	message={$message}
+/>
+
+<style>
+	/*  */
+</style>

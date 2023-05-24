@@ -13,13 +13,6 @@
 </script>
 
 <main class="full flex w-full flex-col items-center bg-gray-800">
-	<DeleteDialog
-		bind:dialogFlag={$deleteFlag}
-		action="?/deleteBrand&brandName={$target}"
-		message="You're about to delete {$target} and all products it has."
-	/>
-	<CreateDialog {data} bind:dialogFlag={$createFlag} />
-
 	<div class="w-2/5">
 		<button
 			class="mt-2 h-14 w-full rounded-lg bg-gray-500 px-4 py-2 text-left text-base font-bold"
@@ -58,4 +51,15 @@
 			</div>
 		{/each}
 	</div>
+
+	<DeleteDialog
+		bind:dialogFlag={$deleteFlag}
+		action="?/deleteBrand&brandName={$target}"
+		message="You're about to delete {$target} and all products it has."
+	/>
+	<CreateDialog {data} bind:dialogFlag={$createFlag} />
 </main>
+
+<style>
+	/*  */
+</style>

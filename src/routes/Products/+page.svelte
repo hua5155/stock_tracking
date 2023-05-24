@@ -71,13 +71,6 @@
 </script>
 
 <main class="flex h-full w-full flex-col items-center bg-gray-800">
-	<DeleteDialog
-		bind:dialogFlag={$deleteFlag}
-		action="?/deleteProduct&productId={$target}"
-		message={$message}
-	/>
-
-	<CreateDialog {data} bind:dialogFlag={$createFlag} />
 	<!-- <form action="?/dummyData" method="post" use:enhance>
 		<button
 			class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold"
@@ -189,4 +182,16 @@
 			</tr>
 		</tbody>
 	</table> -->
+
+	<DeleteDialog
+		bind:dialogFlag={$deleteFlag}
+		action="?/deleteProduct&productId={$target}"
+		message={$message}
+	/>
+
+	<CreateDialog {data} bind:dialogFlag={$createFlag} />
 </main>
+
+<style>
+	/*  */
+</style>
