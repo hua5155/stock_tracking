@@ -8,8 +8,6 @@ import { formValidator as createValidator } from "./CreateDialog.svelte"
 type createSchema = z.infer<typeof createValidator>
 import type { formType as createForm } from "./CreateDialog.svelte"
 
-import { dummyData } from "./TestData.svelte"
-
 const createProduct = async (data: createSchema) => {
   await prisma.product.create({
     data: {
@@ -141,68 +139,6 @@ export const actions: Actions = {
         console.log(error.message);
       }
       return fail(500, { message: "Something went wrong, Couldn't delete the brand." });
-    }
-  },
-  dummyData: async ({ request }) => {
-    let promiseArray = []
-
-    for (const product of dummyData) {
-      for (const variant of product.variants) {
-        // console.log(
-        //   "creating : " +
-        //   product.productBrand + " " +
-        //   product.productName + " " +
-        //   variant.variant
-        // ); // debug
-
-        // createProduct({
-        //   productBrand: product.productBrand,
-        //   productName: product.productName,
-        //   productCategory: product.productCategory,
-        //   productVariant: variant.variant,
-        //   price: variant.price.toString(),
-        //   stock: variant.stock.toString()
-        // } as createForm)
-
-        promiseArray.push(
-          prisma.product.create({
-            data: {
-              brand: {
-                connectOrCreate: {
-                  where: { brandName: product.productBrand },
-                  create: { brandName: product.productBrand }
-                }
-              },
-              productName: product.productName,
-              productVariant: variant.variant,
-              price: variant.price,
-              stock: variant.stock,
-              category: {
-                connectOrCreate: {
-                  where: { categoryName: product.productCategory },
-                  create: { categoryName: product.productCategory }
-                }
-              }
-            }
-          })
-        )
-      }
-    }
-
-    try {
-      await prisma.$transaction(
-        promiseArray,
-        {
-          isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-        }
-      )
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        console.log('Error code : ' + error.code);
-      }
-      if (error instanceof Prisma.PrismaClientUnknownRequestError) {
-        console.log(error.message);
-      }
     }
   }
 };

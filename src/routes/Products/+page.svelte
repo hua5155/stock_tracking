@@ -71,13 +71,6 @@
 </script>
 
 <main class="flex h-full w-full flex-col items-center bg-gray-800">
-	<!-- <form action="?/dummyData" method="post" use:enhance>
-		<button
-			class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold"
-			type="submit">dummyData</button
-		>
-	</form> -->
-
 	<!-- Filter bar -->
 	<div class="flex w-2/5 flex-row justify-between bg-gray-800">
 		<FilterInput
@@ -160,28 +153,6 @@
 			</div>
 		{/each}
 	</div>
-
-	<!-- <table>
-		<thead>
-			<tr class="text-left">
-				<th class="border border-slate-500 px-2">Brand</th>
-				<th class="border border-slate-500 px-2">Product name</th>
-				<th class="border border-slate-500 px-2">Variant</th>
-				<th class="border border-slate-500 px-2">Price</th>
-				<th class="border border-slate-500 px-2">Stock</th>
-			</tr>
-		</thead>
-
-		<tbody>
-			<tr class="text-left">
-				<td class="border border-slate-500 px-2">Pirelli</td>
-				<td class="border border-slate-500 px-2">Corsa II</td>
-				<td class="border border-slate-500 px-2">120/70 R17 F</td>
-				<td class="border border-slate-500 px-2">0</td>
-				<td class="border border-slate-500 px-2">0</td>
-			</tr>
-		</tbody>
-	</table> -->
 
 	<DeleteDialog
 		bind:dialogFlag={$deleteFlag}
