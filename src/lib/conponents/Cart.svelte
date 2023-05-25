@@ -68,15 +68,21 @@
 	};
 </script>
 
-<button
-	class="h-10 w-fit rounded-lg bg-sky-800 px-3 pb-1 text-xl font-semibold"
-	type="button"
-	on:click={() => {
-		postProducts();
-	}}
-	>Checkout
-</button>
-<div class="no-scrollbar flex h-5/6 w-2/5 flex-col space-y-2 overflow-auto">
+<div class="mx-auto h-fit w-fit">
+	<button
+		class="h-10 w-fit rounded-lg bg-sky-800 px-3 pb-1 text-xl font-semibold"
+		type="button"
+		on:click={() => {
+			postProducts();
+		}}
+		>Checkout
+	</button>
+</div>
+
+<div class="no-scrollbar mt-10 flex h-5/6 w-full flex-col space-y-2 overflow-auto">
+	{#if $cart.length === 0}
+		<div>Cart is empty</div>
+	{/if}
 	{#each $cart as item}
 		<div
 			class="flex flex-row items-center justify-between space-x-5 rounded-lg bg-gray-500 py-2 px-4"
@@ -108,3 +114,7 @@
 		</div>
 	{/each}
 </div>
+
+<style>
+	/*  */
+</style>

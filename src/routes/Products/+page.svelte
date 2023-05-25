@@ -12,9 +12,9 @@
 	// export let form: ActionData;
 	// $: console.log('pageData :\n', data);
 
-	const deleteFlag = writable(false);
-	const message = writable('');
-	const target = writable('');
+	// const deleteFlag = writable(false);
+	// const message = writable('');
+	// const target = writable('');
 	const createFlag = writable(false);
 
 	const brandFilter = writable('');
@@ -70,9 +70,9 @@
 	};
 </script>
 
-<main class="flex h-full w-full flex-col items-center bg-gray-800">
+<main class="mx-auto h-screen w-2/5 pt-20">
 	<!-- Filter bar -->
-	<div class="flex w-2/5 flex-row justify-between bg-gray-800">
+	<div class="flex w-full flex-row justify-between">
 		<FilterInput
 			bind:fieldValue={$brandFilter}
 			labelName="Brand"
@@ -93,7 +93,7 @@
 		/>
 	</div>
 	<!-- createProduct button -->
-	<div class="w-2/5">
+	<div class="w-full">
 		<button
 			class="mt-2 h-14 w-full rounded-lg bg-gray-500 px-4 py-2 text-left text-base font-bold"
 			on:click={() => {
@@ -103,8 +103,9 @@
 			+ New Product
 		</button>
 	</div>
+
 	<!-- Product listing -->
-	<div class="no-scrollbar mt-2 flex h-5/6 w-2/5 flex-col space-y-2 overflow-auto">
+	<div class="no-scrollbar mt-2 flex h-5/6 w-full flex-col space-y-2 overflow-auto">
 		{#each listing as product}
 			<div
 				class="flex flex-row items-center justify-between space-x-5 rounded-lg bg-gray-500 py-2 px-4"
@@ -154,11 +155,11 @@
 		{/each}
 	</div>
 
-	<DeleteDialog
+	<!-- <DeleteDialog
 		bind:dialogFlag={$deleteFlag}
 		action="?/deleteProduct&productId={$target}"
 		message={$message}
-	/>
+	/> -->
 
 	<CreateDialog {data} bind:dialogFlag={$createFlag} />
 </main>

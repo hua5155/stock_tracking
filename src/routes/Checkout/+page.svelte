@@ -2,6 +2,6 @@
 	import Cart from '$lib/conponents/Cart.svelte';
 </script>
 
-<main class="flex h-full w-full flex-col items-center bg-gray-800">
+<main class="mx-auto h-screen w-2/5 pt-20">
 	<Cart />
 </main>

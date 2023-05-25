@@ -33,7 +33,8 @@
 
 	export let data: PageData;
 	export let dialogFlag = false;
-	let onLoad = true; // prevent animation on first load
+	$: animationIn = dialogFlag;
+	let animationOut = false;
 
 	$: brands = data.brands.map((item) => item.brandName);
 	$: categories = data.categories.map((item) => item.categoryName);
@@ -147,103 +148,112 @@
 	};
 </script>
 
-<!-- {#if dialogFlag === true} -->
-<!-- {/if} -->
-<div
-	class="absolute top-0 left-0 z-50 flex h-screen w-screen items-center justify-center bg-white/50
-		{dialogFlag ? 'animate-fadeIn' : 'animate-fadeOut'} "
-	style="visibility: {onLoad ? 'hidden' : 'visible'};"
-	on:animationend={() => {
-		onLoad = false;
-	}}
-	on:click|self={() => {
-		dialogFlag = false;
-	}}
-	on:keydown={() => {}}
->
+{#if dialogFlag === true}
 	<div
-		class="h-fit w-fit rounded-2xl bg-gray-300 p-9 text-black
-			{dialogFlag ? 'animate-slideIn' : 'animate-slideOut'}"
+		class="absolute top-0 left-0 z-50 flex h-screen w-screen items-center justify-center bg-white/50
+			{animationIn ? 'animate-fadeIn' : ''} {animationOut ? 'animate-fadeOut' : ''}"
+		on:animationend={() => {
+			if (animationIn === true) {
+				return;
+			}
+
+			animationOut = false;
+			dialogFlag = false;
+		}}
+		on:click|self={() => {
+			animationIn = false;
+			animationOut = true;
+		}}
+		on:keydown={() => {}}
 	>
-		<h3 class="mb-4 text-center text-3xl font-semibold">New product</h3>
-		<form action="?/createProduct" method="post" use:enhance={submitCreate}>
-			<div class="flex flex-row space-x-5">
-				<!-- brand name field -->
-				<FormInput
-					fieldLength="w-40"
-					fieldName={fieldName.productBrand}
-					labelName="Brand"
-					bind:fieldValue={$formFields.productBrand}
-					fieldError={$formErrors.productBrand}
-					list={brands}
-				/>
+		<div
+			class="h-fit w-fit rounded-2xl bg-gray-300 p-9 text-black
+				{animationIn ? 'animate-slideIn' : ''} {animationOut ? 'animate-slideOut' : ''}"
+		>
+			<h3 class="mb-4 text-center text-3xl font-semibold">New product</h3>
+			<form action="?/createProduct" method="post" use:enhance={submitCreate}>
+				<div class="flex flex-row space-x-5">
+					<!-- brand name field -->
+					<FormInput
+						fieldLength="w-40"
+						fieldName={fieldName.productBrand}
+						labelName="Brand"
+						bind:fieldValue={$formFields.productBrand}
+						fieldError={$formErrors.productBrand}
+						list={brands}
+					/>
 
-				<!-- <datalist id="brand-field">
-					{#each brandList as item}
-						<option value={item} />
-					{/each}
-				</datalist> -->
+					<!-- <datalist id="brand-field">
+						{#each brandList as item}
+							<option value={item} />
+						{/each}
+					</datalist> -->
 
-				<!-- product name field -->
-				<FormInput
-					fieldLength="w-52"
-					fieldName={fieldName.productName}
-					labelName="Product"
-					bind:fieldValue={$formFields.productName}
-					fieldError={$formErrors.productName}
-					list={products}
-					autoFillAction={autofillBrand}
-				/>
-			</div>
+					<!-- product name field -->
+					<FormInput
+						fieldLength="w-52"
+						fieldName={fieldName.productName}
+						labelName="Product"
+						bind:fieldValue={$formFields.productName}
+						fieldError={$formErrors.productName}
+						list={products}
+						autoFillAction={autofillBrand}
+					/>
+				</div>
 
-			<div class="flex flex-row space-x-5">
-				<!-- variant name field -->
-				<FormInput
-					fieldLength="w-80"
-					fieldName={fieldName.productVariant}
-					labelName="Variant"
-					bind:fieldValue={$formFields.productVariant}
-					fieldError={$formErrors.productVariant}
-					list={variants}
-				/>
+				<div class="flex flex-row space-x-5">
+					<!-- variant name field -->
+					<FormInput
+						fieldLength="w-80"
+						fieldName={fieldName.productVariant}
+						labelName="Variant"
+						bind:fieldValue={$formFields.productVariant}
+						fieldError={$formErrors.productVariant}
+						list={variants}
+					/>
 
-				<!-- category field -->
-				<FormInput
-					fieldLength="w-48"
-					fieldName={fieldName.productCategory}
-					labelName="Category"
-					bind:fieldValue={$formFields.productCategory}
-					fieldError={$formErrors.productCategory}
-					list={categories}
-				/>
-			</div>
+					<!-- category field -->
+					<FormInput
+						fieldLength="w-48"
+						fieldName={fieldName.productCategory}
+						labelName="Category"
+						bind:fieldValue={$formFields.productCategory}
+						fieldError={$formErrors.productCategory}
+						list={categories}
+					/>
+				</div>
 
-			<div class="flex flex-row space-x-5">
-				<!-- price name field -->
-				<FormInput
-					fieldLength="w-32"
-					fieldName={fieldName.price}
-					labelName="Price"
-					bind:fieldValue={$formFields.price}
-					fieldError={$formErrors.price}
-				/>
+				<div class="flex flex-row space-x-5">
+					<!-- price name field -->
+					<FormInput
+						fieldLength="w-32"
+						fieldName={fieldName.price}
+						labelName="Price"
+						bind:fieldValue={$formFields.price}
+						fieldError={$formErrors.price}
+					/>
 
-				<!-- stock name field -->
-				<FormInput
-					fieldLength="w-32"
-					fieldName={fieldName.stock}
-					labelName="Stock"
-					bind:fieldValue={$formFields.stock}
-					fieldError={$formErrors.stock}
-				/>
-			</div>
+					<!-- stock name field -->
+					<FormInput
+						fieldLength="w-32"
+						fieldName={fieldName.stock}
+						labelName="Stock"
+						bind:fieldValue={$formFields.stock}
+						fieldError={$formErrors.stock}
+					/>
+				</div>
 
-			<button
-				class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
-				type="submit"
-			>
-				Add product
-			</button>
-		</form>
+				<button
+					class="mt-5 h-10 w-fit rounded-2xl bg-cyan-800 px-3 pb-1 text-xl font-semibold text-white"
+					type="submit"
+				>
+					Add product
+				</button>
+			</form>
+		</div>
 	</div>
-</div>
+{/if}
+
+<style>
+	/*  */
+</style>

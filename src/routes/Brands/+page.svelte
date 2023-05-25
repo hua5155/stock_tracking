@@ -12,8 +12,8 @@
 	const createFlag = writable(false);
 </script>
 
-<main class="full flex w-full flex-col items-center bg-gray-800">
-	<div class="w-2/5">
+<main class="mx-auto w-2/5 bg-gray-800 pt-20">
+	<div class="w-full">
 		<button
 			class="mt-2 h-14 w-full rounded-lg bg-gray-500 px-4 py-2 text-left text-base font-bold"
 			on:click={() => {
@@ -23,7 +23,7 @@
 			+ New Product
 		</button>
 	</div>
-	<div class="no-scrollbar mt-2 flex h-4/5 w-2/5 flex-col space-y-2 overflow-auto">
+	<div class="no-scrollbar mt-2 flex h-4/5 w-full flex-col space-y-2 overflow-auto">
 		{#each data.brands as brand}
 			<div
 				class="flex flex-row items-center justify-between space-x-5 rounded-lg bg-gray-500 py-2 px-4"
